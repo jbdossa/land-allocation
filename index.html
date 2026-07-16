@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2nd Comland Parcelles</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>2nd Comland Parcelles</h1>
+      <p>28 parcelles attribuables · priorité aux groupes contigus</p>
+    </div>
+    <div id="lockBadge" class="lock-badge" hidden>Attributions verrouillées</div>
+  </header>
+
+  <main class="dashboard">
+    <section class="dashboard-column participants-column" aria-label="Gestion des participants">
+      <article class="card add-card">
+        <div class="section-heading compact-heading">
+          <h2>Ajouter un participant</h2>
+          <span id="demandSummary" class="pill">0 demandé / 28</span>
+        </div>
+        <form id="participantForm" novalidate>
+          <div class="form-field">
+            <label for="reference">Référence</label>
+            <input id="reference" name="reference" maxlength="80" required placeholder="Famille, personne ou entreprise">
+          </div>
+          <div class="form-field count-field">
+            <label for="plotCount">Nombre</label>
+            <input id="plotCount" name="plotCount" type="number" min="1" max="28" required value="1">
+          </div>
+          <button class="primary form-submit" type="submit">Ajouter</button>
+        </form>
+        <p id="formMessage" class="message" role="status" aria-live="polite"></p>
+      </article>
+
+      <article class="card participants-card flex-card">
+        <div class="section-heading compact-heading">
+          <h2>Participants</h2>
+          <span id="participantCount" class="pill">0 participant</span>
+        </div>
+        <div id="participantsList" class="participants-list scroll-region"></div>
+        <p id="emptyParticipants" class="empty-state">Aucun participant ajouté.</p>
+      </article>
+
+      <article class="card controls-card">
+        <div class="button-grid">
+          <button id="lockButton" type="button">Verrouiller</button>
+          <button id="printButton" type="button">Exporter en PDF</button>
+          <button id="resetAllocationsButton" type="button">Réinitialiser</button>
+          <button id="clearButton" class="danger" type="button">Tout effacer</button>
+          <button id="debugButton" class="secondary full" type="button">Débogage</button>
+        </div>
+        <pre id="debugPanel" class="debug-panel" hidden></pre>
+      </article>
+    </section>
+
+    <section class="dashboard-column maps-column" aria-label="Plans du domaine">
+      <article class="card visual-card original-card">
+        <div class="section-heading compact-heading">
+          <div>
+            <h2>Plan original</h2>
+            <p class="muted">Référence réelle du domaine morcelé</p>
+          </div>
+        </div>
+        <figure class="visual-frame original-frame">
+          <img src="assets/plan-original.jpeg" alt="Plan original du domaine morcelé">
+        </figure>
+      </article>
+
+      <article class="card visual-card interactive-card">
+        <div class="section-heading compact-heading">
+          <div>
+            <h2>Plan interactif</h2>
+            <p class="muted">Cliquez sur une parcelle</p>
+          </div>
+          <span id="remainingBadge" class="pill">28 disponibles</span>
+        </div>
+        <div id="mapContainer" class="map-container visual-frame" aria-label="Carte interactive des parcelles">
+          <noscript>JavaScript doit être activé pour afficher la carte.</noscript>
+        </div>
+      </article>
+    </section>
+
+    <section class="dashboard-column details-column" aria-label="Détails et historique">
+      <article class="card selected-card">
+        <h2>Parcelle sélectionnée</h2>
+        <div id="plotInfo" class="plot-info">Cliquez sur une parcelle.</div>
+      </article>
+
+      <article class="card owner-card">
+        <h2>Attribution associée</h2>
+        <div id="ownerAllocation" class="owner-allocation">
+          <p class="empty-state">Aucun bénéficiaire sélectionné.</p>
+        </div>
+      </article>
+
+      <article class="card history-card flex-card">
+        <div class="section-heading compact-heading">
+          <h2>Historique des attributions</h2>
+          <span id="historyCount" class="pill">0 opération</span>
+        </div>
+        <div id="allocationHistory" class="history-list scroll-region">
+          <p class="empty-state">Aucune attribution effectuée.</p>
+        </div>
+      </article>
+    </section>
+  </main>
+
+  <template id="participantCardTemplate">
+    <article class="participant-card">
+      <div class="participant-card-topline">
+        <strong class="participant-reference"></strong>
+        <span class="status-badge"></span>
+      </div>
+      <div class="participant-meta">
+        <span><b class="participant-count"></b> parcelle(s) demandée(s)</span>
+        <span class="participant-plots"></span>
+      </div>
+      <div class="participant-actions"></div>
+    </article>
+  </template>
+
+  <script defer src="data/plots.js"></script>
+  <script defer src="data/adjacency.js"></script>
+  <script defer src="js/colors.js"></script>
+  <script defer src="js/storage.js"></script>
+  <script defer src="js/graph.js"></script>
+  <script defer src="js/allocation.js"></script>
+  <script defer src="js/map.js"></script>
+  <script defer src="js/app.js"></script>
+</body>
+</html>
