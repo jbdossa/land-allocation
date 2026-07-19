@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>2nd Comland Parcelles</title>
+  <title>2nd Comland Parcelles — v22</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
   <header class="topbar">
     <div>
       <h1>2nd Comland Parcelles</h1>
-      <p>28 parcelles attribuables · priorité aux groupes contigus</p>
+      <p>23 parcelles attribuables · 6 pré-réservées à Famille Hessou · priorité aux groupes contigus</p>
     </div>
     <div id="lockBadge" class="lock-badge" hidden>Attributions verrouillées</div>
   </header>
@@ -20,7 +20,7 @@
       <article class="card add-card">
         <div class="section-heading compact-heading">
           <h2>Ajouter un participant</h2>
-          <span id="demandSummary" class="pill">0 demandé / 28</span>
+          <span id="demandSummary" class="pill">0 demandé / 23</span>
         </div>
         <form id="participantForm" novalidate>
           <div class="form-field">
@@ -29,7 +29,7 @@
           </div>
           <div class="form-field count-field">
             <label for="plotCount">Nombre</label>
-            <input id="plotCount" name="plotCount" type="number" min="1" max="28" required value="1">
+            <input id="plotCount" name="plotCount" type="number" min="1" max="23" required value="1">
           </div>
           <button class="primary form-submit" type="submit">Ajouter</button>
         </form>
@@ -76,7 +76,7 @@
             <h2>Plan interactif</h2>
             <p class="muted">Cliquez sur une parcelle</p>
           </div>
-          <span id="remainingBadge" class="pill">28 disponibles</span>
+          <span id="remainingBadge" class="pill">23 disponibles</span>
         </div>
         <div id="mapContainer" class="map-container visual-frame" aria-label="Carte interactive des parcelles">
           <noscript>JavaScript doit être activé pour afficher la carte.</noscript>
@@ -108,6 +108,7 @@
       </article>
     </section>
   </main>
+  <div class="version-badge" aria-label="Version de l’application">v22</div>
 
   <template id="participantCardTemplate">
     <article class="participant-card">

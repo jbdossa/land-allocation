@@ -46,9 +46,9 @@
     for (const plot of createGeometry()) {
       const ownerId = allocations[plot.id] || null;
       const owner = participants.find(p => p.id === ownerId);
-      const isExcluded = plot.id === App.EXCLUDED_PLOT_ID;
+      const isReserved = App.PRE_RESERVED_PLOT_IDS.includes(plot.id);
       const classes = ['plot'];
-      if (isExcluded) classes.push('excluded');
+      if (isReserved) classes.push('reserved');
       if (selectedPlotId === plot.id) classes.push('selected');
       if (selectedOwnerId && ownerId === selectedOwnerId) classes.push('same-owner');
 
@@ -56,11 +56,11 @@
         id: `plot-${plot.id}`,
         class: classes.join(' '),
         points: plot.points,
-        fill: isExcluded ? '#b8bcc4' : (owner ? owner.color : '#ffffff'),
+        fill: isReserved ? '#b8bcc4' : (owner ? owner.color : '#ffffff'),
         'data-plot-id': plot.id,
         tabindex: '0',
         role: 'button',
-        'aria-label': `${plot.id}${owner ? `, attribuée à ${owner.reference}` : isExcluded ? ', non attribuable' : ', disponible'}`
+        'aria-label': `${plot.id}${isReserved ? `, pré-réservée à ${owner ? owner.reference : App.PRE_RESERVED_OWNER.reference}` : owner ? `, attribuée à ${owner.reference}` : ', disponible'}`
       });
       polygon.addEventListener('click', () => onPlotClick(plot.id));
       polygon.addEventListener('keydown', event => {

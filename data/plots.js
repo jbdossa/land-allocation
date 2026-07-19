@@ -6,13 +6,22 @@
     ...Array.from({ length: 19 }, (_, i) => `L2-${String.fromCharCode(97 + i)}`),
   ];
 
-  App.EXCLUDED_PLOT_ID = 'L2-s';
-  App.ALLOCATABLE_PLOT_IDS = App.PLOT_IDS.filter(id => id !== App.EXCLUDED_PLOT_ID);
+  App.PRE_RESERVED_PLOT_IDS = ['L2-n', 'L2-o', 'L2-p', 'L2-q', 'L2-r', 'L2-s'];
+  App.PRE_RESERVED_OWNER = {
+    id: 'pre-reserved-famille-hessou',
+    reference: 'Famille Hessou',
+    requestedPlots: App.PRE_RESERVED_PLOT_IDS.length,
+    status: 'reserved',
+    reserved: true,
+    color: '#b8bcc4'
+  };
+  App.ALLOCATABLE_PLOT_IDS = App.PLOT_IDS.filter(id => !App.PRE_RESERVED_PLOT_IDS.includes(id));
   App.PLOTS = Object.fromEntries(App.PLOT_IDS.map(id => [id, {
     id,
     lot: id.slice(0, 2),
     label: id.split('-')[1],
-    allocatable: id !== App.EXCLUDED_PLOT_ID,
+    allocatable: !App.PRE_RESERVED_PLOT_IDS.includes(id),
+    preReserved: App.PRE_RESERVED_PLOT_IDS.includes(id),
   }]));
 
   /*

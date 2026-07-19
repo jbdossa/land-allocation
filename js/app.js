@@ -12,7 +12,20 @@
     });
 
     let state = Object.assign(defaultState(), App.loadState() || {});
+    if (!Array.isArray(state.participants)) state.participants = [];
+    if (!state.allocations || typeof state.allocations !== 'object') state.allocations = {};
     if (!Array.isArray(state.history)) state.history = [];
+
+    function ensurePreReservedAllocation() {
+      const reserved = Object.assign({}, App.PRE_RESERVED_OWNER);
+      state.participants = state.participants.filter(participant => participant.id !== reserved.id);
+      state.participants.unshift(reserved);
+      App.PRE_RESERVED_PLOT_IDS.forEach(plotId => {
+        state.allocations[plotId] = reserved.id;
+      });
+    }
+
+    ensurePreReservedAllocation();
     state.selectedPlotId = null;
     state.selectedOwnerId = null;
 
@@ -60,7 +73,9 @@
     }
 
     function totalDemand() {
-      return state.participants.reduce((sum, participant) => sum + participant.requestedPlots, 0);
+      return state.participants
+        .filter(participant => !participant.reserved)
+        .reduce((sum, participant) => sum + participant.requestedPlots, 0);
     }
 
     function showMessage(message, success) {
@@ -90,7 +105,7 @@
         reference,
         requestedPlots,
         status: 'pending',
-        color: App.colorForIndex(state.participants.length)
+        color: App.colorForIndex(state.participants.filter(participant => !participant.reserved).length)
       };
     }
 
@@ -102,8 +117,8 @@
       const requestedPlots = Number(elements.plotCount.value);
 
       if (!reference) return showMessage('La référence est obligatoire.', false);
-      if (!Number.isInteger(requestedPlots) || requestedPlots < 1 || requestedPlots > 28) {
-        return showMessage('Le nombre doit être un entier compris entre 1 et 28.', false);
+      if (!Number.isInteger(requestedPlots) || requestedPlots < 1 || requestedPlots > App.ALLOCATABLE_PLOT_IDS.length) {
+        return showMessage(`Le nombre doit être un entier compris entre 1 et ${App.ALLOCATABLE_PLOT_IDS.length}.`, false);
       }
 
       state.participants.push(createParticipant(reference, requestedPlots));
@@ -117,7 +132,7 @@
     function deleteParticipant(id) {
       if (state.locked) return;
       const participant = participantById(id);
-      if (!participant || participant.status === 'allocated') return;
+      if (!participant || participant.reserved || participant.status === 'allocated') return;
 
       const confirmed = window.confirm(
         `Confirmer la suppression de « ${participant.reference} » ?\n\n` +
@@ -133,7 +148,7 @@
     function allocateParticipant(id) {
       if (state.locked) return;
       const participant = participantById(id);
-      if (!participant || participant.status === 'allocated') return;
+      if (!participant || participant.reserved || participant.status === 'allocated') return;
 
       const available = availablePlots();
       if (participant.requestedPlots > available.length) {
@@ -204,7 +219,9 @@
       state.participants.forEach(participant => {
         const card = elements.cardTemplate.content.firstElementChild.cloneNode(true);
         const plots = plotsForParticipant(participant.id);
-        const allocated = participant.status === 'allocated';
+        const reserved = participant.reserved === true;
+        const allocated = participant.status === 'allocated' || reserved;
+        if (reserved) card.classList.add('pre-reserved');
 
         card.querySelector('.participant-reference').textContent = participant.reference;
         card.querySelector('.participant-count').textContent = participant.requestedPlots;
@@ -214,19 +231,22 @@
         card.style.setProperty('--participant-color', participant.color || '#98a2b3');
 
         const status = card.querySelector('.status-badge');
-        status.textContent = allocated ? 'Attribué' : 'En attente';
-        status.classList.toggle('allocated', allocated);
+        status.textContent = reserved ? 'Pré-réservé' : allocated ? 'Attribué' : 'En attente';
+        status.classList.toggle('allocated', allocated && !reserved);
+        status.classList.toggle('reserved', reserved);
 
         const actions = card.querySelector('.participant-actions');
-        const allocateButton = document.createElement('button');
-        allocateButton.type = 'button';
-        allocateButton.textContent = allocated ? '✓ Attribué' : 'Attribuer';
-        allocateButton.className = allocated ? 'success' : 'primary';
-        allocateButton.disabled = allocated || state.locked;
-        allocateButton.addEventListener('click', () => allocateParticipant(participant.id));
-        actions.append(allocateButton);
+        if (!reserved) {
+          const allocateButton = document.createElement('button');
+          allocateButton.type = 'button';
+          allocateButton.textContent = allocated ? '✓ Attribué' : 'Attribuer';
+          allocateButton.className = allocated ? 'success' : 'primary';
+          allocateButton.disabled = allocated || state.locked;
+          allocateButton.addEventListener('click', () => allocateParticipant(participant.id));
+          actions.append(allocateButton);
+        }
 
-        if (!allocated) {
+        if (!allocated && !reserved) {
           const deleteButton = document.createElement('button');
           deleteButton.type = 'button';
           deleteButton.textContent = 'Supprimer';
@@ -270,8 +290,11 @@
         return;
       }
 
-      if (id === App.EXCLUDED_PLOT_ID) {
-        elements.plotInfo.innerHTML = `<strong>${id}</strong><br>Statut : Non attribuable`;
+      if (App.PRE_RESERVED_PLOT_IDS.includes(id)) {
+        elements.plotInfo.innerHTML =
+          `<strong>${id}</strong><br>` +
+          `Statut : Pré-réservée<br>` +
+          `Bénéficiaire : <strong>${escapeHtml(App.PRE_RESERVED_OWNER.reference)}</strong>`;
         return;
       }
 
@@ -367,11 +390,13 @@
     function renderStatus() {
       const available = availablePlots().length;
       elements.remainingBadge.textContent = `${available} disponible${available > 1 ? 's' : ''}`;
-      elements.demandSummary.textContent = `${totalDemand()} demandé / 28`;
-      elements.demandSummary.style.background = totalDemand() > 28 ? '#fef3f2' : '#eef4ff';
-      elements.demandSummary.style.color = totalDemand() > 28 ? '#b42318' : '#3538cd';
+      const capacity = App.ALLOCATABLE_PLOT_IDS.length;
+      elements.demandSummary.textContent = `${totalDemand()} demandé / ${capacity}`;
+      elements.demandSummary.style.background = totalDemand() > capacity ? '#fef3f2' : '#eef4ff';
+      elements.demandSummary.style.color = totalDemand() > capacity ? '#b42318' : '#3538cd';
       elements.lockBadge.hidden = !state.locked;
-      elements.lockButton.disabled = state.locked || Object.keys(state.allocations).length === 0;
+      const hasSessionAllocations = Object.keys(state.allocations).some(id => !App.PRE_RESERVED_PLOT_IDS.includes(id));
+      elements.lockButton.disabled = state.locked || !hasSessionAllocations;
       elements.lockButton.textContent = state.locked ? 'Verrouillé' : 'Verrouiller';
       elements.form.querySelectorAll('input, button').forEach(element => {
         element.disabled = state.locked;
@@ -389,24 +414,26 @@
     }
 
     function resetAllocations() {
-      if (!window.confirm('Réinitialiser toutes les attributions tout en conservant les participants ?')) return;
+      if (!window.confirm('Réinitialiser les attributions courantes tout en conservant les participants et les pré-réservations ?')) return;
       state.allocations = {};
       state.history = [];
       state.locked = false;
       state.selectedPlotId = null;
       state.selectedOwnerId = null;
-      state.participants = state.participants.map(participant => Object.assign({}, participant, {
-        status: 'pending',
-        components: undefined
-      }));
+      state.participants = state.participants.map(participant => participant.reserved
+        ? Object.assign({}, App.PRE_RESERVED_OWNER)
+        : Object.assign({}, participant, { status: 'pending', components: undefined }));
+      ensurePreReservedAllocation();
       persist();
       render();
     }
 
     function clearEverything() {
-      if (!window.confirm('Supprimer tous les participants, toutes les attributions et tout l’historique ?')) return;
+      if (!window.confirm('Supprimer tous les participants ordinaires, toutes les attributions courantes et tout l’historique ? Les pré-réservations seront conservées.')) return;
       state = defaultState();
+      ensurePreReservedAllocation();
       App.clearState();
+      persist();
       render();
     }
 

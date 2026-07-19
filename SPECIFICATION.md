@@ -13,12 +13,12 @@ Dépôt cible : `https://github.com/jbdossa/land-allocation`.
 Le terrain contient 29 zones physiques :
 
 - Lot 1 : `L1-a` à `L1-j` — 10 parcelles attribuables ;
-- Lot 2 : `L2-a` à `L2-s` — 19 parcelles physiques ;
-- `L2-s` est visible mais exclue de toute attribution.
+- Lot 2 : `L2-a` à `L2-n, L2-o, L2-p, L2-q, L2-r et L2-s` — 19 parcelles physiques ;
+- `L2-n, L2-o, L2-p, L2-q, L2-r et L2-s` est visible mais exclue de toute attribution.
 
-Il y a donc **28 parcelles attribuables**.
+Il y a **29 parcelles au total**, dont **23 parcelles attribuables** et **6 parcelles pré-réservées**.
 
-`L2-s` doit rester grise, porter le statut « Non attribuable » et ne jamais apparaître dans le groupe des parcelles disponibles.
+`L2-n, L2-o, L2-p, L2-q, L2-r et L2-s` doit rester grise, porter le statut « Non attribuable » et ne jamais apparaître dans le groupe des parcelles disponibles.
 
 ## 3. Interface générale
 
@@ -102,7 +102,7 @@ Les règles retenues sont :
 - bordures uniformes noires ou gris foncé ;
 - une couleur de remplissage distincte par participant ;
 - même couleur pour toutes les parcelles d'un participant ;
-- `L2-s` en gris ;
+- `L2-n, L2-o, L2-p, L2-q, L2-r et L2-s` en gris ;
 - survol et sélection visibles par un contour renforcé.
 
 ## 7. Graphe d'adjacence
@@ -159,7 +159,7 @@ Lorsqu'il existe plusieurs solutions de qualité équivalente, l'une d'elles est
 
 Sont exclues de chaque nouveau calcul :
 
-- `L2-s` ;
+- `L2-n, L2-o, L2-p, L2-q, L2-r et L2-s` ;
 - toutes les parcelles déjà attribuées.
 
 ### 8.7 Insuffisance
@@ -280,7 +280,7 @@ L'application est fonctionnelle lorsque :
 - la quantité attribuée est exacte ;
 - la continuité est privilégiée ;
 - aucune double attribution n'est possible ;
-- `L2-s` reste exclue ;
+- `L2-n, L2-o, L2-p, L2-q, L2-r et L2-s` reste exclue ;
 - la carte se met à jour immédiatement ;
 - un clic identifie le bénéficiaire ;
 - le récapitulatif reste synchronisé ;
@@ -350,3 +350,8 @@ Après minimisation du nombre de composantes contiguës, les solutions sont clas
 3. les formes compactes partageant davantage de frontières internes sont préférées ;
 4. le diamètre du groupe dans le graphe d'adjacence est minimisé ;
 5. le choix demeure aléatoire entre toutes les solutions ayant exactement le même score.
+
+
+## Version 22 — pré-réservations
+
+Les parcelles L2-n, L2-o, L2-p, L2-q, L2-r et L2-s sont pré-réservées à **Famille Hessou**. Ce participant permanent est affiché en gris, ne peut pas être supprimé et n’est affecté ni par la réinitialisation des attributions ni par l’effacement général. Ces six parcelles sont exclues du moteur d’attribution.

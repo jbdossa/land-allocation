@@ -90,6 +90,7 @@ th { color: var(--muted); font-size: .68rem; text-transform: uppercase; letter-s
 td { font-size: .78rem; overflow-wrap: anywhere; }
 .status-badge { display: inline-block; padding: .2rem .4rem; border-radius: 999px; font-size: .68rem; font-weight: 800; background: #f2f4f7; color: #475467; }
 .status-badge.allocated { background: #dcfae6; color: #067647; }
+.status-badge.reserved { background: #e4e7ec; color: #344054; }
 .row-actions { display: flex; gap: .35rem; min-width: 155px; }
 .row-actions button { min-height: 30px; padding: .3rem .45rem; font-size: .7rem; }
 .empty-state { color: var(--muted); text-align: center; padding: .7rem; margin: 0; font-size: .8rem; }
@@ -110,7 +111,7 @@ td { font-size: .78rem; overflow-wrap: anywhere; }
 .plot:hover { filter: brightness(1.04); stroke-width: 4; }
 .plot.selected { stroke: #111827; stroke-width: 6; filter: drop-shadow(0 0 5px rgba(37, 99, 235, .55)); }
 .plot.same-owner { stroke: #2563eb; stroke-width: 5; }
-.plot.excluded { cursor: not-allowed; }
+.plot.reserved { cursor: pointer; }
 .plot-label { pointer-events: none; font-size: 18px; font-weight: 800; fill: #172033; text-anchor: middle; dominant-baseline: middle; }
 .map-note { font-size: 15px; fill: #475467; font-weight: 700; }
 .road { fill: #f2f4f7; stroke: #98a2b3; stroke-width: 1.5; stroke-dasharray: 6 5; }
@@ -397,5 +398,69 @@ td { font-size: .78rem; overflow-wrap: anywhere; }
     max-height: 100% !important;
     margin: auto;
     object-fit: contain !important;
+  }
+}
+
+/* Version 22 — parcelles pré-réservées avec propriétaire permanent */
+
+.participant-card.pre-reserved {
+  border-left-color: #98a2b3;
+  border-color: #cfd4dc;
+  background: #f2f4f7;
+  color: #475467;
+}
+.participant-card.pre-reserved .participant-meta { color: #667085; }
+.participant-card.pre-reserved .participant-actions { grid-template-columns: 1fr; }
+.version-badge {
+  position: fixed;
+  right: .55rem;
+  bottom: .35rem;
+  z-index: 30;
+  padding: .2rem .45rem;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, .82);
+  color: #fff;
+  font-size: .68rem;
+  font-weight: 800;
+}
+@media print { .version-badge { display: none; } }
+
+
+/* Version 22 — correction de pagination à l’impression.
+   La carte contenant toute la liste doit pouvoir se fractionner entre les pages.
+   Sinon le navigateur la déplace entièrement, ce qui peut produire une première page vide. */
+@media print {
+  .participants-column {
+    break-after: auto !important;
+    page-break-after: auto !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  .participants-card,
+  .participants-list {
+    display: block !important;
+    break-inside: auto !important;
+    page-break-inside: auto !important;
+  }
+
+  .participants-card {
+    margin: 0 !important;
+  }
+
+  .participants-card .section-heading {
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .participant-card {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  /* Le plan commence après la dernière page de participants. */
+  .maps-column {
+    break-before: page !important;
+    page-break-before: always !important;
   }
 }

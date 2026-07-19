@@ -1,6 +1,6 @@
 # Attribution de parcelles
 
-Application web statique en français pour attribuer 28 parcelles à des participants, en privilégiant des groupes contigus.
+Application web statique en français pour gérer 29 parcelles, dont 23 attribuables et 6 pré-réservées, en privilégiant des groupes contigus.
 
 ## Lancer localement
 
@@ -69,3 +69,17 @@ L'attribution conserve la priorité au nombre minimal de blocs contigus, puis :
 2. à défaut, privilégie les formes ayant le plus faible étalement vertical et horizontal ;
 3. favorise les groupes qui partagent davantage de frontières internes ;
 4. choisit aléatoirement entre les solutions ayant exactement le même score pratique.
+
+
+## Version 22
+
+- Ajout du participant permanent **Famille Hessou**.
+- Pré-réservation de `L2-o`, `L2-p`, `L2-q`, `L2-r` et `L2-s`.
+- Ces parcelles sont exclues de l’algorithme d’attribution.
+- Le participant et ses parcelles survivent à Réinitialiser et Tout effacer.
+
+
+### Version 22 — mise à jour
+
+- Ajout de `L2-n` aux parcelles pré-réservées à **Famille Hessou**.
+- Correction de l’impression afin d’éviter une première page vide lorsque la liste des participants est longue.
